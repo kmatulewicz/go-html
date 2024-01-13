@@ -16,6 +16,7 @@ type Tag struct {
 	ContentIndex      int               // The index points to the next character after the opening tag's closure in doc (it might be outside the doc range).
 	AfterClosureIndex int               // The index points to the next character after the closing tag's closure in doc (it might be outside the doc range).
 	doc               string            // A String where the tag was found.
+	checks            []Check           // A slice of check functions used to find the tag
 }
 
 // Content returns a string between the starting tag and the closing tag of t.
@@ -35,6 +36,25 @@ func (t *Tag) Content() string {
 
 	// return content between those tags
 	return t.doc[t.ContentIndex : t.ContentIndex+closureIndex]
+}
+
+// Return the next *Tag with the same name and check functions
+func (t *Tag) Next() *Tag {
+	if t == nil {
+		return nil
+	}
+
+	newT := Find(t.doc[t.ContentIndex:], t.Name, t.checks)
+	if newT == nil {
+		return nil
+	}
+
+	// change the starting point of the doc
+	newT.doc = t.doc
+	newT.ContentIndex += t.ContentIndex
+	newT.AfterClosureIndex += t.ContentIndex
+
+	return newT
 }
 
 // Find returns a *Tag struct representing a tag found in the s string, which has the n name and satisfies all f functions.
@@ -64,6 +84,7 @@ loop:
 			ContentIndex:      end,
 			AfterClosureIndex: getAfterClosureIndex(s, n, end),
 			doc:               s,
+			checks:            f,
 		}
 
 		// check if t will pass all f

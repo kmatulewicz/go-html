@@ -64,6 +64,12 @@ func TestFind(t *testing.T) {
 			want: &Tag{Name: "br", Attr: map[string]string{"/": ""}, ContentIndex: 6, AfterClosureIndex: -1},
 		},
 	}
+	for i := range tests {
+		if tests[i].want != nil {
+			tests[i].want.checks = tests[i].args.match
+		}
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.want != nil {
