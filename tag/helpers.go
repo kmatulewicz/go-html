@@ -76,7 +76,7 @@ func findTag(s, n string) (start, end int) {
 		// calculate the position of the next char after the found tag name
 		endNameCharIndex := start + len(n)
 		// check if the found tag name is not only the beginning of the proper name (after the name is some other character, then a closure or a white space)
-		if !(unicode.IsSpace(rune(s[endNameCharIndex])) || s[endNameCharIndex] == '>' || s[endNameCharIndex] == '/') {
+		if isValidAttrNameChar(s[endNameCharIndex]) {
 			// continue after the current tag
 			pos = end
 			continue
@@ -98,4 +98,9 @@ func findStartTag(s, n string) (start, end int) {
 // findStartTag returns the start and end points of the closing tag with the name n in s
 func findEndTag(s, n string) (start, end int) {
 	return findTag(s, "</"+n)
+}
+
+// isValidAttrNameChar checks if b is a valid character for an attribute name
+func isValidAttrNameChar(b byte) bool {
+	return !(unicode.IsSpace(rune(b)) || b == '>' || b == '/')
 }
