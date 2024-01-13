@@ -66,13 +66,11 @@ loop:
 			doc:               s,
 		}
 
-		// loop over all f functions
-		for _, m := range f {
-			if !m(t) {
-				// if the tag does not satisfy the function, continue after the current tag
-				pos = end
-				continue loop
-			}
+		// check if t will pass all f
+		if !passChecks(f, t) {
+			// continue after the current tag if checks failed
+			pos = end
+			continue loop
 		}
 
 		// return a found tag
@@ -81,4 +79,18 @@ loop:
 
 	// no such tag
 	return nil
+}
+
+// passChecks returns true if t pass all checks; returns false if not
+func passChecks(checks []Check, t *Tag) bool {
+	// loop over all checks
+	for _, c := range checks {
+		if !c(t) {
+			// the tag does not satisfy the function
+			return false
+		}
+	}
+
+	// the tag does satisfy the function
+	return true
 }
