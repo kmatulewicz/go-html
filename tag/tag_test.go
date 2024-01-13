@@ -67,14 +67,11 @@ func TestFind(t *testing.T) {
 	for i := range tests {
 		if tests[i].want != nil {
 			tests[i].want.checks = tests[i].args.match
+			tests[i].want.doc = tests[i].args.doc
 		}
 	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.want != nil {
-				tt.want.doc = tt.args.doc
-			}
 			if got := Find(tt.args.doc, tt.args.tag, tt.args.match); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Find() = %v, want %v", got, tt.want)
 			}
@@ -106,6 +103,90 @@ func TestContent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := Find(tt.args.doc, tt.args.tag, tt.args.match).Content(); got != tt.want {
 				t.Errorf("Find().Content() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTag_Next(t *testing.T) {
+	type fields struct {
+		Name              string
+		Attr              map[string]string
+		ContentIndex      int
+		AfterClosureIndex int
+		doc               string
+		checks            []Check
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   *Tag
+	}{
+		{
+			"1",
+			fields{
+				"a",
+				map[string]string{"id": "1"},
+				8,
+				28,
+				"<a id=1><a id=2><a id=3></a></a></a>",
+				[]Check{Has("id")},
+			},
+			&Tag{"a",
+				map[string]string{"id": "2"},
+				16,
+				32,
+				"<a id=1><a id=2><a id=3></a></a></a>",
+				[]Check{Has("id")}},
+		},
+		{
+			"2",
+			fields{
+				"a",
+				map[string]string{"id": "1"},
+				8,
+				32,
+				"<a id=1><br><a id=2><a id=3></a></a></a>",
+				[]Check{Has("id")},
+			},
+			&Tag{"a",
+				map[string]string{"id": "2"},
+				20,
+				36,
+				"<a id=1><br><a id=2><a id=3></a></a></a>",
+				[]Check{Has("id")}},
+		},
+		{
+			"3",
+			fields{
+				"a",
+				map[string]string{"id": "3"},
+				28,
+				40,
+				"<a id=1><br><a id=2><a id=3></a></a></a>",
+				[]Check{Has("id")},
+			},
+			nil,
+		},
+	}
+	for i := range tests {
+		if tests[i].want != nil {
+			tests[i].want.checks = tests[i].fields.checks
+		}
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tr := &Tag{
+				Name:              tt.fields.Name,
+				Attr:              tt.fields.Attr,
+				ContentIndex:      tt.fields.ContentIndex,
+				AfterClosureIndex: tt.fields.AfterClosureIndex,
+				doc:               tt.fields.doc,
+				checks:            tt.fields.checks,
+			}
+			got := tr.Next()
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Tag.Next() = %v, want %v", got, tt.want)
 			}
 		})
 	}
