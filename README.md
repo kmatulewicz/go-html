@@ -1,3 +1,7 @@
+[![Build Status](https://github.com/kmatulewicz/go-html/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/kmatulewicz/go-html/actions/workflows/go.yml?query=branch%3Amain)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kmatulewicz/go-html)](https://goreportcard.com/report/github.com/kmatulewicz/go-html)
+[![codecov](https://codecov.io/gh/kmatulewicz/go-html/graph/badge.svg?token=TWCZIJDDCB)](https://codecov.io/gh/kmatulewicz/go-html)
+
 # go-html/tag
 
 The go-html/tag package provides a convenient and flexible method to search for an HTML tag with a specific name and attributes. It is useful for web crawlers to quickly extract data from websites. It does not implement the full HTML specification, so there might be cases where it will not work correctly.
