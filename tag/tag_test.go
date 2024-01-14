@@ -63,6 +63,41 @@ func TestFind(t *testing.T) {
 			args: args{doc: `<br />`, tag: "br", match: []Check{}},
 			want: &Tag{Name: "br", Attr: map[string]string{"/": ""}, ContentIndex: 6, AfterClosureIndex: -1},
 		},
+		{
+			name: "10",
+			args: args{doc: `<some attr1="cont1" attr2="cont2" attr3="cont with space">`, tag: "some", match: []Check{Contains("attr5", "cont1")}},
+			want: nil,
+		},
+		{
+			name: "11",
+			args: args{doc: `<some aTTr1="cont1" attr2="cont2" attr3="cont with space">`, tag: "some", match: []Check{Equal("attr5", "cont1"), Equal("attr1", "cont")}},
+			want: nil,
+		},
+		{
+			name: "12",
+			args: args{doc: `<br = />`, tag: "br", match: []Check{}},
+			want: &Tag{Name: "br", Attr: map[string]string{}, ContentIndex: 8, AfterClosureIndex: -1},
+		},
+		{
+			name: "13",
+			args: args{doc: `<br name">`, tag: "br", match: []Check{}},
+			want: &Tag{Name: "br", Attr: map[string]string{}, ContentIndex: 10, AfterClosureIndex: -1},
+		},
+		{
+			name: "14",
+			args: args{doc: `<br name=val=">`, tag: "br", match: []Check{}},
+			want: &Tag{Name: "br", Attr: map[string]string{}, ContentIndex: 15, AfterClosureIndex: -1},
+		},
+		{
+			name: "15",
+			args: args{doc: `<br name="val"/">`, tag: "br", match: []Check{}},
+			want: &Tag{Name: "br", Attr: map[string]string{}, ContentIndex: 17, AfterClosureIndex: -1},
+		},
+		{
+			name: "16",
+			args: args{doc: `<br name="val""">`, tag: "br", match: []Check{}},
+			want: &Tag{Name: "br", Attr: map[string]string{}, ContentIndex: 17, AfterClosureIndex: -1},
+		},
 	}
 	for i := range tests {
 		if tests[i].want != nil {
@@ -106,25 +141,24 @@ func TestContent(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("nil", func(t *testing.T) {
+		var tag *Tag
+		if tc := tag.Content(); tc != "" {
+			t.Errorf("Find().Content() = %v, want %v", tc, nil)
+		}
+	})
 }
 
 func TestTag_Next(t *testing.T) {
-	type fields struct {
-		Name              string
-		Attr              map[string]string
-		ContentIndex      int
-		AfterClosureIndex int
-		doc               string
-		checks            []Check
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   *Tag
+		name string
+		arg  *Tag
+		want *Tag
 	}{
 		{
 			"1",
-			fields{
+			&Tag{
 				"a",
 				map[string]string{"id": "1"},
 				8,
@@ -141,7 +175,7 @@ func TestTag_Next(t *testing.T) {
 		},
 		{
 			"2",
-			fields{
+			&Tag{
 				"a",
 				map[string]string{"id": "1"},
 				8,
@@ -158,7 +192,7 @@ func TestTag_Next(t *testing.T) {
 		},
 		{
 			"3",
-			fields{
+			&Tag{
 				"a",
 				map[string]string{"id": "3"},
 				28,
@@ -171,23 +205,22 @@ func TestTag_Next(t *testing.T) {
 	}
 	for i := range tests {
 		if tests[i].want != nil {
-			tests[i].want.checks = tests[i].fields.checks
+			tests[i].want.checks = tests[i].arg.checks
 		}
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tr := &Tag{
-				Name:              tt.fields.Name,
-				Attr:              tt.fields.Attr,
-				ContentIndex:      tt.fields.ContentIndex,
-				AfterClosureIndex: tt.fields.AfterClosureIndex,
-				doc:               tt.fields.doc,
-				checks:            tt.fields.checks,
-			}
-			got := tr.Next()
+			got := tt.arg.Next()
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Tag.Next() = %v, want %v", got, tt.want)
 			}
 		})
 	}
+
+	t.Run("nil", func(t *testing.T) {
+		var tag *Tag
+		if tn := tag.Next(); tn != nil {
+			t.Errorf("Tag.Next() = %v, want %v", tn, nil)
+		}
+	})
 }
