@@ -1,6 +1,7 @@
 /*
 The go-html/tag package provides a convenient and flexible method to search for an HTML tag with a specific name and attributes.
-Useful for web crawlers to quickly extract data from websites.
+It is useful for web crawlers to quickly extract data from websites.
+
 It does not implement the full HTML specification, so there might be cases where it will not work correctly.
 */
 package tag
