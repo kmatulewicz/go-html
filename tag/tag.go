@@ -26,7 +26,7 @@ func (t *Tag) Content() string {
 		return ""
 	}
 
-	if t.AfterClosureIndex == -1 {
+	if t.AfterClosureIndex < 1 {
 		// there is no closing tag; return empty content
 		return ""
 	}
