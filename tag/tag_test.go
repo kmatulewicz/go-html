@@ -98,6 +98,16 @@ func TestFind(t *testing.T) {
 			args: args{doc: `<br name="val""">`, tag: "br", match: []Check{}},
 			want: &Tag{Name: "br", Attr: map[string]string{}, ContentIndex: 17, AfterClosureIndex: -1},
 		},
+		{
+			name: "17",
+			args: args{doc: `<some attr1="cont1" attr2="cont2" attr3="cont with space">`, tag: "some", match: []Check{NotEmpty("attr2")}},
+			want: &Tag{Name: "some", Attr: map[string]string{"attr1": "cont1", "attr2": "cont2", "attr3": "cont with space"}, ContentIndex: 58, AfterClosureIndex: -1},
+		},
+		{
+			name: "18",
+			args: args{doc: `<some attr1="cont1" attr2 attr3="cont with space">`, tag: "some", match: []Check{NotEmpty("attr2")}},
+			want: nil,
+		},
 	}
 	for i := range tests {
 		if tests[i].want != nil {

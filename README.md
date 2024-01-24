@@ -29,6 +29,7 @@ The function returns a pointer to the Tag structure or a nil pointer if there is
 Currently, in the tag module are available those Check functions:
 
 - `func Has(attr string) Check` - it determines if the attribute of the given name exists in the tag,
+- `func NotEmpty(attr string) Check` - it determines if the value of the attr attribute is not empty,
 - `func Contains(attr, s string) Check` - it determines if the value of the attr attribute contains the s string,
 - `func Equal(attr, s string) Check` - it determines if the value of the attr attribute is equal to the s string.
 

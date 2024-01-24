@@ -42,3 +42,17 @@ func Equal(attr, s string) Check {
 		return v == s
 	}
 }
+
+// NotEmpty determines if the value of the attr attribute is not empty.
+// Returns false if the attribute does not exist.
+// attr is case-insensitive.
+func NotEmpty(attr string) Check {
+	return func(t *Tag) bool {
+		v, ok := t.Attr[strings.ToLower(attr)]
+		if !ok || len(v) == 0 {
+			return false
+		}
+
+		return true
+	}
+}
